@@ -31,6 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     
     // 调用PlayerServer的vote方法
     const voteResponse = await playerServer.vote(context);
+    console.log("vote:",voteResponse);
     
     res.json(voteResponse);
   } catch (error) {

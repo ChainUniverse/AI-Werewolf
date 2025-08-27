@@ -24,30 +24,35 @@ export type PersonalityType = 'aggressive' | 'conservative' | 'witty' | 'cunning
 
 // Player context for game state
 export interface PlayerContext {
-  gameId: string;
-  playerId: number;
-  phase: GamePhase;
-  day: number;
-  alivePlayers: number[];
-  deadPlayers: number[];
-  lastNightDeaths: number[];
-  discussionHistory: Array<{
-    playerId: number;
-    message: string;
+  round: number;
+  currentPhase: GamePhase;
+  alivePlayers: Array<{
+    id: number;
+    isAlive: boolean;
   }>;
-  votes?: { [key: number]: number };
+  allSpeeches: Record<number, Array<{
+    playerId: number;
+    content: string;
+    type?: 'player' | 'system';
+  }>>;
+  allVotes: Record<number, Array<{
+    voterId: number;
+    targetId: number;
+  }>>;
 }
 
 // Witch specific context
 export interface WitchContext extends PlayerContext {
-  hasUsedPoison: boolean;
-  hasUsedAntidote: boolean;
-  lastNightKill?: number;
+  killedTonight?: number;
+  potionUsed: { heal: boolean; poison: boolean };
 }
 
 // Seer specific context
 export interface SeerContext extends PlayerContext {
-  investigatedPlayers: { [key: number]: { target: number; isGood: boolean } };
+  investigatedPlayers: Record<number, {
+    target: number;
+    isGood: boolean;
+  }>;
 }
 
 // Game start parameters
@@ -55,7 +60,7 @@ export interface StartGameParams {
   gameId: string;
   playerId: number;
   role: string;
-  teammates?: number[];
+  teammates: number[];
 }
 
 // Response schemas

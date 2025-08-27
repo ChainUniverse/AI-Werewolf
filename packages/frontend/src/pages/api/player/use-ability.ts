@@ -28,9 +28,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!playerServer) {
       return res.status(404).json({ error: 'Current player not found' });
     }
-        console.log('Use ability request:', context,playerServer.getPlayerId());
+    console.log('Use ability request:', context,playerServer.getPlayerId());
     // 调用PlayerServer的useAbility方法
     const result = await playerServer.useAbility(context);
+    console.log("use ability result:",result);
     
     res.json(result);
   } catch (error) {

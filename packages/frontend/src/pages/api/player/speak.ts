@@ -31,6 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     
     // 调用PlayerServer的speak方法
     const speech = await playerServer.speak(context);
+    console.log("speak:",speech);
     
     res.json({ speech });
   } catch (error) {

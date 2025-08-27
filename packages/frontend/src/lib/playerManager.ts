@@ -63,79 +63,70 @@ class PlayerManager {
   }
 }
 
-const playerManager = new PlayerManager();
+// 使用全局变量保持单例模式，避免每次请求重新初始化
+const globalForPlayerManager = globalThis as unknown as {
+  playerManager: PlayerManager | undefined;
+  currentPlayerId: number | null;
+};
 
-// 预设一些默认玩家
-const defaultConfigs: PlayerConfig[] = [
-  {
-    name: 'Aggressive Player',
+// 确保PlayerManager只初始化一次
+if (!globalForPlayerManager.playerManager) {
+  globalForPlayerManager.playerManager = new PlayerManager();
+  globalForPlayerManager.currentPlayerId = null;
+  
+  // 预设8个默认玩家 - 只在首次初始化时创建
+  const baseConfig = {
+    name: '智能分析师', // 从game.name移到根级别
     ai: {
-      apiKey: process.env.OPENROUTER_API_KEY || 'sk-or-v1-test-key-for-demo',
-      model: 'openai/gpt-4o-mini',
-      maxTokens: 1000,
+      apiKey: process.env.OPENROUTER_API_KEY || '',
+      model: 'deepseek/deepseek-r1-0528-qwen3-8b:free', // 真正匹配frontend的default.json
+      maxTokens: 150,
       temperature: 0.8
     },
     game: {
-      personality: 'aggressive',
-      strategy: 'aggressive',
-      speechStyle: 'casual',
-      aggressiveness: 8,
-      deceptionLevel: 6,
-      cooperationLevel: 4
+      personality: 'cunning' as const, // PersonalityType枚举限制
+      strategy: 'balanced' as const,
+      speechStyle: 'casual' as const, // 从JSON中的speakingStyle映射
+      aggressiveness: 5, // TypeScript类型需要的数字
+      deceptionLevel: 3, // TypeScript类型需要的数字
+      cooperationLevel: 7 // TypeScript类型需要的数字
     },
     logging: {
       enabled: true,
-      level: 'info'
+      level: 'info' as const
     }
-  },
-  {
-    name: 'Conservative Player',
-    ai: {
-      apiKey: process.env.OPENROUTER_API_KEY || 'sk-or-v1-test-key-for-demo',
-      model: 'openai/gpt-4o-mini',
-      maxTokens: 1000,
-      temperature: 0.5
-    },
-    game: {
-      personality: 'conservative',
-      strategy: 'conservative',
-      speechStyle: 'formal',
-      aggressiveness: 3,
-      deceptionLevel: 4,
-      cooperationLevel: 8
-    },
-    logging: {
-      enabled: true,
-      level: 'info'
-    }
-  },
-  {
-    name: 'Witty Player',
-    ai: {
-      apiKey: process.env.OPENROUTER_API_KEY || 'sk-or-v1-test-key-for-demo',
-      model: 'openai/gpt-4o-mini',
-      maxTokens: 1000,
-      temperature: 0.9
-    },
-    game: {
-      personality: 'witty',
-      strategy: 'balanced',
-      speechStyle: 'witty',
-      aggressiveness: 6,
-      deceptionLevel: 7,
-      cooperationLevel: 6
-    },
-    logging: {
-      enabled: true,
-      level: 'info'
-    }
-  }
-];
+  };
 
-// 初始化默认玩家
-defaultConfigs.forEach((config, index) => {
-  playerManager.addPlayer(index + 1, config);
-});
+  const defaultConfigs: PlayerConfig[] = Array(8).fill(0).map((_, index) => ({
+    ...baseConfig,
+    name: `智能分析师${index + 1}`
+  }));
+
+  // 初始化默认玩家
+  defaultConfigs.forEach((config, index) => {
+    globalForPlayerManager.playerManager!.addPlayer(index + 1, config);
+  });
+  
+  console.log('PlayerManager initialized once with 8 players');
+}
+
+const playerManager = globalForPlayerManager.playerManager;
+
+// 设置当前玩家ID
+export function setCurrentPlayerId(playerId: number): void {
+  globalForPlayerManager.currentPlayerId = playerId;
+}
+
+// 获取当前玩家ID
+export function getCurrentPlayerId(): number | null {
+  return globalForPlayerManager.currentPlayerId;
+}
+
+// 获取当前玩家的PlayerServer
+export function getCurrentPlayerServer(): PlayerServer | undefined {
+  if (globalForPlayerManager.currentPlayerId === null) return undefined;
+  return getPlayerServer(globalForPlayerManager.currentPlayerId);
+}
 
 export function getPlayerServer(id: number): PlayerServer | undefined {
   const player = playerManager.getPlayer(id);

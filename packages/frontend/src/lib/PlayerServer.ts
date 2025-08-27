@@ -17,6 +17,7 @@ import {
   SpeechResponseSchema
 } from '../types';
 import { getRoleNightAction } from '../prompts/night';
+import { getRoleSpeech } from '../prompts/speech';
 import { generateObject } from 'ai';
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 
@@ -195,10 +196,7 @@ export class PlayerServer {
 
   // Prompt构建方法
   private buildSpeechPrompt(context: PlayerContext): string {
-    const gameContext = this.buildGameContextPrompt(context);
-    const personalityPrompt = this.buildPersonalityPrompt();
-    
-    return personalityPrompt + gameContext + '\n\n注意：发言内容控制在30-80字，语言自然，像真人玩家。\n\n请分析当前情况并给出你的发言：';
+    return getRoleSpeech(this, context);
   }
 
   private buildVotePrompt(context: PlayerContext): string {

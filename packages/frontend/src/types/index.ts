@@ -63,37 +63,47 @@ export interface StartGameParams {
   teammates: number[];
 }
 
-// Response schemas
+// Speech Response Schema - 对应发言生成的返回格式
 export const SpeechResponseSchema = z.object({
-  speech: z.string()
+  speech: z.string().describe('生成的发言内容')
 });
 
+// Voting Response Schema - 对应投票决策的返回格式
 export const VotingResponseSchema = z.object({
-  target: z.number(),
-  reason: z.string()
+  target: z.number().describe('要投票的玩家ID'),
+  reason: z.string().describe('投票的理由')
 });
 
+// 狼人夜间行动Schema - 匹配API的WerewolfAbilityResponse
 export const WerewolfNightActionSchema = z.object({
-  action: z.literal('kill'),
-  target: z.number(),
-  reason: z.string()
+  action: z.literal('kill').describe('行动类型，狼人固定为kill'),
+  target: z.number().describe('要击杀的目标玩家ID'),
+  reason: z.string().describe('选择该目标的详细理由，包括对其身份的推测'),
 });
 
+// 预言家夜间行动Schema - 匹配API的SeerAbilityResponse
 export const SeerNightActionSchema = z.object({
-  action: z.literal('investigate'),
-  target: z.number(),
-  reason: z.string()
+  action: z.literal('investigate').describe('行动类型，预言家固定为investigate'),
+  target: z.number().describe('要查验身份的目标玩家ID'),
+  reason: z.string().describe('选择查验该玩家的理由，基于其发言和行为的分析'),
 });
 
+// 女巫夜间行动Schema - 匹配API的WitchAbilityResponse
 export const WitchNightActionSchema = z.object({
-  action: z.union([
-    z.literal('use_antidote'),
-    z.literal('use_poison'),
-    z.literal('skip')
-  ]),
-  target: z.number().optional(),
-  reason: z.string()
+  action: z.enum(['using', 'idle']).describe('行动类型：using表示使用药水，idle表示不使用'),
+  healTarget: z.number().describe('救人的目标玩家ID，0表示不救人'),
+  healReason: z.string().describe('救人或不救人的理由'),
+  poisonTarget: z.number().describe('毒人的目标玩家ID，0表示不毒人'),
+  poisonReason: z.string().describe('毒人或不毒人的理由'),
 });
+
+
+// 通用夜间行动Schema (向后兼容)
+export const NightActionResponseSchema = z.union([
+  WerewolfNightActionSchema,
+  SeerNightActionSchema,
+  WitchNightActionSchema
+]);
 
 export type SpeechResponseType = z.infer<typeof SpeechResponseSchema>;
 export type VotingResponseType = z.infer<typeof VotingResponseSchema>;

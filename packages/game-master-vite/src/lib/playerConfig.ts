@@ -5,10 +5,10 @@ export function getPlayerUrls(): string[] {
   // In production, these could come from environment variables
   // For now, we'll use the default localhost URLs
   const defaultPlayers = [
-    'http://localhost:3001',
-    'http://localhost:3002',
-    'http://localhost:3003',
-    'http://localhost:3004',
+    'http://localhost:4001',
+    'http://localhost:4002',
+    'http://localhost:4003',
+    'http://localhost:4004',
     'http://localhost:3005',
     'http://localhost:3006',
     'http://localhost:3007',

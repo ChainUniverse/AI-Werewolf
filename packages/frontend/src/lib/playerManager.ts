@@ -70,7 +70,7 @@ const defaultConfigs: PlayerConfig[] = [
   {
     name: 'Aggressive Player',
     ai: {
-      apiKey: process.env.OPENROUTER_API_KEY || '',
+      apiKey: process.env.OPENROUTER_API_KEY || 'sk-or-v1-test-key-for-demo',
       model: 'openai/gpt-4o-mini',
       maxTokens: 1000,
       temperature: 0.8
@@ -91,7 +91,7 @@ const defaultConfigs: PlayerConfig[] = [
   {
     name: 'Conservative Player',
     ai: {
-      apiKey: process.env.OPENROUTER_API_KEY || '',
+      apiKey: process.env.OPENROUTER_API_KEY || 'sk-or-v1-test-key-for-demo',
       model: 'openai/gpt-4o-mini',
       maxTokens: 1000,
       temperature: 0.5
@@ -112,7 +112,7 @@ const defaultConfigs: PlayerConfig[] = [
   {
     name: 'Witty Player',
     ai: {
-      apiKey: process.env.OPENROUTER_API_KEY || '',
+      apiKey: process.env.OPENROUTER_API_KEY || 'sk-or-v1-test-key-for-demo',
       model: 'openai/gpt-4o-mini',
       maxTokens: 1000,
       temperature: 0.9

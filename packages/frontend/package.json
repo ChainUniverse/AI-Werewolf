@@ -5,6 +5,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev0": "next dev -p 4001",
+    "dev1": "next dev -p 4002",
+    "dev2": "next dev -p 4003",
+    "dev3": "next dev -p 4004",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

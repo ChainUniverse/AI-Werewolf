@@ -56,7 +56,12 @@ export class PlayerServer {
   }
 
   async speak(context: PlayerContext): Promise<string> {
-    if (!this.role || !this.config.ai.apiKey) {
+    if (!this.role) {
+      return "我还没有确定自己的角色。";
+    }
+
+    const apiKey = this.config.ai.apiKey || process.env.OPENROUTER_API_KEY;
+    if (!apiKey || apiKey.trim() === '') {
       return "我需要仔细思考一下当前的情况。";
     }
 
@@ -65,16 +70,26 @@ export class PlayerServer {
   }
 
   async vote(context: PlayerContext): Promise<VotingResponseType> {
-    if (!this.role || !this.config.ai.apiKey) {
-      return { target: 1, reason: "默认投票给玩家1" };
+    if (!this.role) {
+      return { target: 1, reason: "角色未设置，默认投票" };
+    }
+
+    const apiKey = this.config.ai.apiKey || process.env.OPENROUTER_API_KEY;
+    if (!apiKey || apiKey.trim() === '') {
+      return { target: 1, reason: "API密钥未配置，默认投票" };
     }
 
     return await this.generateVote(context);
   }
 
   async useAbility(context: PlayerContext | WitchContext | SeerContext): Promise<any> {
-    if (!this.role || !this.config.ai.apiKey) {
-      throw new Error("我没有特殊能力可以使用。");
+    if (!this.role) {
+      throw new Error("角色未设置，无法使用能力。");
+    }
+
+    const apiKey = this.config.ai.apiKey || process.env.OPENROUTER_API_KEY;
+    if (!apiKey || apiKey.trim() === '') {
+      throw new Error("API密钥未配置，无法使用AI能力。");
     }
 
     return await this.generateAbilityUse(context);
@@ -249,7 +264,10 @@ ${gameContext}
 
 ${gameContext}
 
-${roleSpecificPrompt}`;
+${roleSpecificPrompt}
+
+## 响应格式
+请以JSON格式返回你的决策。`;
   }
 
   private buildGameContextPrompt(context: PlayerContext): string {

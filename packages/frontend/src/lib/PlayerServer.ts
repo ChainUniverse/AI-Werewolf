@@ -16,6 +16,7 @@ import {
   WitchNightActionSchema,
   SpeechResponseSchema
 } from '../types';
+import { getRoleNightAction } from '../prompts/night';
 import { generateObject } from 'ai';
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 
@@ -144,7 +145,7 @@ export class PlayerServer {
       
       return result.object as T;
     } catch (error) {
-      console.error(`AI ${functionId} failed:`, error);
+      // console.error(`AI ${functionId} failed:`, error);
       throw new Error(`Failed to generate ${functionId}: ${error}`);
     }
   }
@@ -227,36 +228,7 @@ export class PlayerServer {
   }
 
   private buildAbilityPrompt(context: PlayerContext | WitchContext | SeerContext): string {
-    const gameContext = this.buildGameContextPrompt(context);
-    const personalityPrompt = this.buildPersonalityPrompt();
-    
-    let roleSpecificInfo = '';
-    
-    switch (this.role) {
-      case Role.WITCH:
-        const witchContext = context as WitchContext;
-        roleSpecificInfo = `\n\n## 女巫能力状态\n- 解药已使用: ${witchContext.potionUsed.heal}\n- 毒药已使用: ${witchContext.potionUsed.poison}`;
-        if (witchContext.killedTonight) {
-          roleSpecificInfo += `\n- 今晚被杀玩家: ${witchContext.killedTonight}`;
-        }
-        break;
-      case Role.SEER:
-        const seerContext = context as SeerContext;
-        if (Object.keys(seerContext.investigatedPlayers).length > 0) {
-          roleSpecificInfo = '\n\n## 已查验玩家\n';
-          for (const [round, investigation] of Object.entries(seerContext.investigatedPlayers)) {
-            roleSpecificInfo += `- 第${round}轮查验玩家${investigation.target}: ${investigation.isGood ? '好人' : '狼人'}\n`;
-          }
-        }
-        break;
-      case Role.WEREWOLF:
-        if (this.teammates && this.teammates.length > 0) {
-          roleSpecificInfo = `\n\n## 狼人队友\n- 队友: ${this.teammates.join(', ')}`;
-        }
-        break;
-    }
-    
-    return personalityPrompt + gameContext + roleSpecificInfo + `\n\n请根据当前情况决定你的${this.role}能力使用：`;
+    return getRoleNightAction(this, context);
   }
 
   // 辅助方法

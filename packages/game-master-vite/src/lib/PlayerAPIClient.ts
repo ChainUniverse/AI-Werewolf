@@ -16,7 +16,8 @@ export class PlayerAPIClient {
 
   constructor(playerId: number, url: string) {
     this.playerId = playerId;
-    this.url = url;
+    // 确保URL末尾没有斜杠
+    this.url = url.replace(/\/$/, '');
   }
 
   // 函数重载 - 精确的类型映射

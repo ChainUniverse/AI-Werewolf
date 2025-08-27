@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { PlayerServer } from '../../../lib/PlayerServer';
-import type { StartGameParams } from '../../../types';
 
 // 创建全局PlayerServer实例
 let playerServer: PlayerServer;
@@ -47,19 +46,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       playerServer = new PlayerServer(config);
     }
 
-    const params: StartGameParams = req.body;
+    console.log('Last words request');
     
-    console.log('Start game request:', params);
+    // 调用PlayerServer的lastWords方法
+    const lastWords = await playerServer.lastWords();
     
-    // 调用PlayerServer的startGame方法
-    await playerServer.startGame(params);
-    
-    res.json({ 
-      message: 'Game started successfully', 
-      langfuseEnabled: true 
-    });
+    res.json({ content: lastWords });
   } catch (error) {
-    console.error('Start game error:', error);
-    res.status(500).json({ error: 'Failed to start game' });
+    console.error('Last words error:', error);
+    res.status(500).json({ error: 'Failed to generate last words' });
   }
 }

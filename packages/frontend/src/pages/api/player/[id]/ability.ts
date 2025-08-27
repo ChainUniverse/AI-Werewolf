@@ -20,6 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const context: PlayerContext | WitchContext | SeerContext = req.body;
     const ability = await playerServer.useAbility(context);
+    console.log("use ability:",ability);
     
     res.status(200).json(ability);
   } catch (error) {

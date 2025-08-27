@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { PlayerServer } from '../../../lib/PlayerServer';
-import type { StartGameParams } from '../../../types';
+import type { PlayerContext } from '../../../types';
 
 // 创建全局PlayerServer实例
 let playerServer: PlayerServer;
@@ -47,19 +47,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       playerServer = new PlayerServer(config);
     }
 
-    const params: StartGameParams = req.body;
+    const context: PlayerContext = req.body;
     
-    console.log('Start game request:', params);
+    console.log('Speak request:', context);
     
-    // 调用PlayerServer的startGame方法
-    await playerServer.startGame(params);
+    // 调用PlayerServer的speak方法
+    const speech = await playerServer.speak(context);
     
-    res.json({ 
-      message: 'Game started successfully', 
-      langfuseEnabled: true 
-    });
+    res.json({ speech });
   } catch (error) {
-    console.error('Start game error:', error);
-    res.status(500).json({ error: 'Failed to start game' });
+    console.error('Speak error:', error);
+    res.status(500).json({ error: 'Failed to generate speech' });
   }
 }

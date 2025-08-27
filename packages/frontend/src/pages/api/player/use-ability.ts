@@ -1,4 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { PlayerServer } from '../../../lib/PlayerServer';
+import type { PlayerContext, WitchContext, SeerContext } from '../../../types';
+
+// 创建全局PlayerServer实例
+let playerServer: PlayerServer;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // 设置CORS头
@@ -16,15 +21,40 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const requestBody = req.body;
+    // 初始化PlayerServer（如果还没有）
+    if (!playerServer) {
+      const config = {
+        name: '智能分析师',
+        ai: {
+          apiKey: process.env.OPENROUTER_API_KEY || '',
+          model: 'openai/gpt-4',
+          maxTokens: 200,
+          temperature: 0.8
+        },
+        game: {
+          personality: 'cunning' as const,
+          strategy: 'balanced' as const,
+          speechStyle: 'casual' as const,
+          aggressiveness: 5,
+          deceptionLevel: 3,
+          cooperationLevel: 7
+        },
+        logging: {
+          enabled: true,
+          level: 'info' as const
+        }
+      };
+      playerServer = new PlayerServer(config);
+    }
+
+    const context: PlayerContext | WitchContext | SeerContext = req.body;
     
-    console.log('Use ability request:', requestBody);
+    console.log('Use ability request:', context);
     
-    // 返回示例响应
-    res.json({ 
-      success: true,
-      message: 'Ability used successfully' 
-    });
+    // 调用PlayerServer的useAbility方法
+    const result = await playerServer.useAbility(context);
+    
+    res.json(result);
   } catch (error) {
     console.error('Use ability error:', error);
     res.status(500).json({ error: 'Failed to use ability' });

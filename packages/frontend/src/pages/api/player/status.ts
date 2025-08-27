@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { PlayerServer } from '../../../lib/PlayerServer';
-import type { StartGameParams } from '../../../types';
 
 // 创建全局PlayerServer实例
 let playerServer: PlayerServer;
@@ -16,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(204).end();
   }
 
-  if (req.method !== 'POST') {
+  if (req.method !== 'POST' && req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
@@ -47,19 +46,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       playerServer = new PlayerServer(config);
     }
 
-    const params: StartGameParams = req.body;
+    // 调用PlayerServer的getStatus方法
+    const status = playerServer.getStatus();
     
-    console.log('Start game request:', params);
-    
-    // 调用PlayerServer的startGame方法
-    await playerServer.startGame(params);
-    
-    res.json({ 
-      message: 'Game started successfully', 
-      langfuseEnabled: true 
-    });
+    res.json(status);
   } catch (error) {
-    console.error('Start game error:', error);
-    res.status(500).json({ error: 'Failed to start game' });
+    console.error('Status error:', error);
+    res.status(500).json({ error: 'Failed to get status' });
   }
 }
